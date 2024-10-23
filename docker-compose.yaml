@@ -1,0 +1,280 @@
+version: '3.8'
+services:
+  cache:
+    container_name: cache
+    image: redislabs/redistimeseries
+    restart: always
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --save 20 1
+      --notify-keyspace-events "KA"
+      --loadmodule /usr/lib/redis/modules/redistimeseries.so
+    volumes:
+      - ./data/redis/cache:/data
+    healthcheck:
+      test: redis-cli -a "${REDIS_PASSWORD}" ping
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    env_file: .env
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+    # ports:
+      # - '6379:6379'
+  # postgres:
+  #   container_name: postgres
+  #   image: 'postgres:latest'
+  #   env_file: .env
+  #   volumes:
+  #     - ./data/postgres/db-data/:/var/lib/postgresql/data/
+  #     - ./data/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   healthcheck:
+  #     test: /usr/bin/pg_isready -u postgres
+  #     interval: 2s
+  #     timeout: 5s
+  #     retries: 120
+  #   labels:
+  #     logging: "promtail"
+  #     logging_jobname: "containerlogs"
+  #   # ports:
+  #   #   - '5432:5432'
+  # harmonic_detector:
+  #   container_name: harmonic_detector
+  #   build: ./trading/apps/harmonic_detector
+  #   env_file: .env
+  #   volumes:
+  #     - ./trading/apps/harmonic_detector/main.py:/app/main.py
+  #     - ./trading/apps/harmonic_detector/src:/app/src
+  #     - ./trading/apps/harmonic_detector/data:/app/data
+  #   depends_on:
+  #     cache:
+  #       condition: service_healthy
+  #   labels:
+  #     logging: "promtail"
+  #     logging_jobname: "containerlogs"
+  # bollinger_signal:
+  #   container_name: bollinger_signal
+  #   build: ./trading/apps/bollinger_signal
+  #   env_file: .env
+  #   volumes:
+  #     - ./trading/apps/bollinger_signal/main.py:/app/main.py
+  #     - ./trading/apps/bollinger_signal/src:/app/src
+  #   depends_on:
+  #     cache:
+  #       condition: service_healthy
+  #   labels:
+  #     logging: "promtail"
+  #     logging_jobname: "containerlogs"
+  # trader:
+  #   container_name: trader
+  #   build: 
+  #     context: ./trading
+  #     args:
+  #       APP: trader
+  #   volumes:
+  #     - ./trading/apps/trader/src:/app/apps/trader/src
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     cache:
+  #       condition: service_healthy
+  #   labels:
+  #     logging: "promtail"
+  #     logging_jobname: "containerlogs"
+  #   expose:
+  #     - 3000
+  #   # ports:
+  #   #   - '3000:3000'
+  # scraper:
+  #   container_name: scraper
+  #   build:
+  #     context: ./trading
+  #     args:
+  #       APP: scraper
+  #   volumes:
+  #     - ./trading/apps/scraper/src:/app/apps/scraper/src
+  #   depends_on:
+  #     cache:
+  #       condition: service_healthy
+  #   env_file: .env
+  #   labels:
+  #     logging: "promtail"
+  #     logging_jobname: "containerlogs"
+  # rust-bitmex-book-scraper:
+  #   container_name: rust-bitmex-book-scraper
+  #   build: ./trading/apps/rust-bitmex-book-scraper
+  #   depends_on:
+  #     cache:
+  #       condition: service_healthy
+  #   env_file: .env
+  #   labels:
+  #     logging: "promtail"
+  #     logging_jobname: "containerlogs"
+  # rust-bitmex-trade-scraper:
+  #   container_name: rust-bitmex-trade-scraper
+  #   build: ./trading/apps/rust-bitmex-trade-scraper
+  #   depends_on:
+  #     cache:
+  #       condition: service_healthy
+  #   env_file: .env
+  #   labels:
+  #     logging: "promtail"
+  #     logging_jobname: "containerlogs"
+  rust-bitmex-quote-scraper:
+    container_name: rust-bitmex-quote-scraper
+    build: ./trading/apps/rust-bitmex-quote-scraper
+    depends_on:
+      cache:
+        condition: service_healthy
+    env_file: .env
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+  rust-binance-quote-scraper:
+    container_name: rust-binance-quote-scraper
+    build: ./trading/apps/rust-binance-quote-scraper
+    depends_on:
+      cache:
+        condition: service_healthy
+    env_file: .env
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+  rust-coinbase-quote-scraper:
+    container_name: rust-coinbase-quote-scraper
+    build: ./trading/apps/rust-coinbase-quote-scraper
+    depends_on:
+      cache:
+        condition: service_healthy
+    env_file: .env
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+  rust-bybit-quote-scraper:
+    container_name: rust-bybit-quote-scraper
+    build: ./trading/apps/rust-bybit-quote-scraper
+    depends_on:
+      cache:
+        condition: service_healthy
+    env_file: .env
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-enterprise
+    restart: unless-stopped
+    environment:
+      - GF_AUTH_DISABLE_SIGNOUT_MENU=true
+      - GF_AUTH_SIGNOUT_REDIRECT_URL=http://${HOST}/sso/logout
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN=true
+      - GF_SERVER_ROOT_URL=http://${HOST}/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_INSTALL_PLUGINS=redis-datasource
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - grafana_storage:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+  loki:
+    container_name: loki
+    image: grafana/loki:2.9.1
+    volumes:
+      - ./monitoring/loki/config/loki-config.yaml:/etc/loki/loki-config.yaml
+      - loki_storage:/loki
+    command: -config.file=/etc/loki/loki-config.yaml
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:2.9.1
+    volumes:
+      - ./monitoring/promtail/config/promtail-config.yaml:/etc/promtail/promtail-config.yml
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/promtail-config.yml
+    depends_on:
+      - loki
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_storage:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+  node-exporter:
+    container_name: node-exporter
+    image: prom/node-exporter:latest
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    depends_on:
+      - prometheus
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    volumes: 
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:ro"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
+      - "/dev/disk/:/dev/disk:ro"
+    privileged: true
+    devices: 
+      - "/dev/kmsg"
+  vouch:
+    container_name: vouch
+    image: quay.io/vouch/vouch-proxy
+    restart: unless-stopped
+    ports:
+      - 9090:9090
+    volumes:
+      - ./vouch/config/config.yml:/config/config.yml
+    env_file: .env
+    environment:
+      - VOUCH_COOKIE_DOMAIN=${HOST}
+      - VOUCH_POST_LOGOUT_REDIRECT_URIS=https://<SECRET>.uk.auth0.com/v2/logout?client_id=<SECRET>&returnTo=https://${HOST}/
+      - OAUTH_CALLBACK_URL=https://${HOST}/sso/auth
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+  nginx:
+    container_name: nginx
+    image: nginx
+    volumes:
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/templates/env.conf.template:/etc/nginx/templates/env.conf.template
+      - ./nginx/web/:/usr/share/nginx/html/
+      - ./nginx/cert/:/certs
+      - ./nginx/logs:/var/log/local_tee
+    ports:
+      - 443:443
+      - 80:80
+    env_file: .env
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+    depends_on:
+      - grafana
+volumes:
+  grafana_storage: {}
+  prometheus_storage: {}
+  loki_storage: {}

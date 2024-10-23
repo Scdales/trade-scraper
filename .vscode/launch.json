@@ -1,0 +1,102 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Harmonic Detector",
+            "type": "python",
+            "request": "launch",
+            "program": "main.py",
+            "cwd": "${workspaceRoot}/trading/apps/harmonic_detector",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "envFile": "${workspaceRoot}/.env",
+            "env": {
+                "REDIS_HOST": "localhost",
+                "PYTHONUNBUFFERED": "0"
+            }
+        },
+        {
+            "name": "Backtrader",
+            "cwd": "${workspaceRoot}/trading/apps/backtrader",
+            "program": "test.py",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "envFile": "${workspaceRoot}/.env",
+            "env": {
+                "REDIS_HOST": "localhost"
+            }
+        },
+        {
+            "name": "Bollinger Bands",
+            "type": "python",
+            "request": "launch",
+            "program": "trading/apps/bollinger_signal/main.py",
+            "justMyCode": true,
+            "envFile": "${workspaceRoot}/.env",
+            "env": {
+                "REDIS_HOST": "localhost"
+            }
+        },
+        {
+            "name": "Scraper",
+            "type": "node",
+            "request": "launch",
+            "smartStep": false,
+            "sourceMaps": true,
+            "args": [
+                "index.ts"
+            ],
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register/transpile-only"
+            ],
+            "cwd": "${workspaceRoot}/trading/apps/scraper/src",
+            "envFile": "${workspaceRoot}/.env",
+            "internalConsoleOptions": "openOnSessionStart",
+            "env": {
+                "TS_NODE_FILES": "true", // Respect include/exclude in tsconfig.json => will read declaration files  (ts-node --files src\index.ts)
+                "REDIS_HOST": "localhost"
+            },
+            "skipFiles": [
+                "<node_internals>/*",
+                "<node_internals>/**",
+                "<node_internals>/**/*"
+            ],
+            "outputCapture": "std",
+            "stopOnEntry": false
+        },
+        {
+            "name": "Trader",
+            "type": "node",
+            "request": "launch",
+            "smartStep": false,
+            "sourceMaps": true,
+            "args": [
+                "index.ts"
+            ],
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register/transpile-only"
+            ],
+            "cwd": "${workspaceRoot}/trading/apps/trader/src",
+            "envFile": "${workspaceRoot}/.env",
+            "internalConsoleOptions": "openOnSessionStart",
+            "env": {
+                "TS_NODE_FILES": "true", // Respect include/exclude in tsconfig.json => will read declaration files  (ts-node --files src\index.ts)
+                "REDIS_HOST": "localhost"
+            },
+            "skipFiles": [
+                "<node_internals>/*",
+                "<node_internals>/**",
+                "<node_internals>/**/*"
+            ],
+            "outputCapture": "std",
+            "stopOnEntry": false
+        }
+    ]
+}

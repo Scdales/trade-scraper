@@ -1,0 +1,19 @@
+{
+    "search.exclude": {
+       "**/node_modules": true,
+       "out/**": true, // Don't search the TypeScript "out" folder
+       "eslint.autoFixOnSave": true,
+   },
+   "[python]": {
+      "editor.defaultFormatter": "ms-python.autopep8"
+   },
+   "rust-analyzer.linkedProjects": [
+      "/Users/logan/Proggy/ig-trade/docker/trading/apps/rust-test/Cargo.toml",
+      "/Users/logan/Proggy/ig-trade/docker/trading/apps/rust-bitmex-book-scraper/Cargo.toml",
+      "/Users/logan/Proggy/ig-trade/docker/trading/apps/rust-bitmex-trade-scraper/Cargo.toml",
+      "/Users/logan/Proggy/ig-trade/docker/trading/apps/rust-bitmex-quote-scraper/Cargo.toml",
+      "/Users/logan/Proggy/ig-trade/docker/trading/apps/rust-binance-quote-scraper/Cargo.toml",
+      "/Users/logan/Proggy/ig-trade/docker/trading/apps/rust-coinbase-quote-scraper/Cargo.toml",
+      "/Users/logan/Proggy/ig-trade/docker/trading/apps/rust-bybit-quote-scraper/Cargo.toml"
+   ]
+  }

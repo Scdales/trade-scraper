@@ -1,0 +1,25 @@
+For installing TA-Lib:
+
+Download and build ta-lib:
+curl -O http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+tar -xf ta-lib-0.4.0-src.tar.gz
+./configure --prefix=/Users/logan/Proggy/ta-lib/build
+make
+make install
+
+Then in project:
+
+export TA_LIBRARY_PATH=/Users/logan/Proggy/ta-lib/build/lib
+export TA_INCLUDE_PATH=/Users/logan/Proggy/ta-lib/build/include
+
+Patterns:
+- gartley
+- bat
+- altbat
+- butterfly
+- crab
+- deepcrab
+- shark
+- 5o
+- cypher
+- abcd

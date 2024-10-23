@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Go</title>
+    <link href="/style.css" rel="stylesheet">
+    <script>
+        function onClick() {
+            location.href = '/sso/login?url=http\:\/\/<!--# echo var="external_ip" default="" -->/grafana';
+        };
+    </script>
+</head>
+
+<body>
+    <div class="button-container">
+        <button onclick="onClick()"
+            class="button submit-button">Go</button>
+    </div>
+</body>
+
+</html>
